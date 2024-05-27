@@ -19,6 +19,8 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Connect Four")
 
+font = pygame.font.SysFont("monospace", 30)
+
 def draw_board(board):
     for c in range(COLUMN_COUNT):
         for r in range(ROW_COUNT):
@@ -90,24 +92,23 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pygame.draw.rect(screen, BLACK, (0, 0, WIDTH, SQUARESIZE))
-                if turn == 0:
-                    posx = event.pos[0]
-                    col = posx // SQUARESIZE
-                    if is_valid_location(board, col):
-                        row = get_next_open_row(board, col)
-                        drop_piece(board, row, col, 1)
-                        if winning_move(board, 1):
-                            print("Player 1 wins!")
-                            game_over = True
+                posx = event.pos[0]
+                col = posx // SQUARESIZE
+
+                if is_valid_location(board, col):
+                    row = get_next_open_row(board, col)
+                    drop_piece(board, row, col, 1 if turn == 0 else 2)
+
+                    if winning_move(board, 1 if turn == 0 else 2):
+                        print(f"Player {turn + 1} wins!")
+                        game_over = True
                 else:
-                    posx = event.pos[0]
-                    col = posx // SQUARESIZE
-                    if is_valid_location(board, col):
-                        row = get_next_open_row(board, col)
-                        drop_piece(board, row, col, 2)
-                        if winning_move(board, 2):
-                            print("Player 2 wins!")
-                            game_over = True
+                    label = font.render("You can't play that >:(", 1, RED)
+                    screen.blit(label, (40, 10))
+                    pygame.display.update()
+                    pygame.time.wait(1000)
+                    continue  # Skip turn change and redraw
+
                 turn += 1
                 turn %= 2
 
